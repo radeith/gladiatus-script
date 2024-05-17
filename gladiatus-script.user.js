@@ -1,17 +1,81 @@
 // ==UserScript==
 // @name         Gladiatus Script
 // @version      2.6.4
-// @description  Dodatek do gry Gladiatus
-// @author       Eryk Bodziony
+// @description  galyali by gladiatus
+// @author       galyalicrix
 // @match        *://*.gladiatus.gameforge.com/game/index.php*
 // @exclude      *://*.gladiatus.gameforge.com/game/index.php?mod=start
-// @downloadURL  https://github.com/ebodziony/gladiatus-script/raw/master/gladiatus-script.js
-// @updateURL    https://github.com/ebodziony/gladiatus-script/raw/master/gladiatus-script.js
+// @downloadURL  https://github.com/radeith/radeithbot/blob/6cefc219d0dc8290520d755cf123e0e4822b7350/gladiatusscript.js
+// @updateURL    https://github.com/radeith/radeithbot/blob/6cefc219d0dc8290520d755cf123e0e4822b7350/gladiatusscript.js
 // @grant        GM_addStyle
 // @grant        GM_getResourceText
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js
-// @resource     customCSS_global  https://raw.githubusercontent.com/ebodziony/gladiatus-script/master/global.css?ver=2.6.4
+// @resource     customCSS_global  https://raw.githubusercontent.com/radeith/radeithbot/6cefc219d0dc8290520d755cf123e0e4822b7350/gladiatusscripttt.css
 // ==/UserScript==
+
+// Global değişkenler
+const currentDate = $("#server-time").html().split(',')[0];
+const player = {
+    level: Number($("#header_values_level").first().html()),
+    hp: Number($("#header_values_hp_percent").first().html().replace(/[^0-9]/gi, '')),
+    gold: Number($("#sstat_gold_val").first().html().replace(/\./g, '')),
+};
+const commission48h = 1000; // 48 saatlik komisyon ücreti, ihtiyaca göre güncellenebilir
+
+// İttifak marketi yönetim fonksiyonları
+function manageAllianceMarket() {
+    console.log("İttifak marketi kontrol ediliyor...");
+    $.get('/game/index.php?mod=guildMarket&sh=' + sh, function(data) {
+        let items = $(data).find('.item');
+        items.each(function() {
+            let itemPrice = Number($(this).find('.price').text().replace(/\./g, ''));
+            if (player.gold >= itemPrice + commission48h) { // 48 saatlik komisyon ücretiyle karşılaştırma
+                let itemLink = $(this).find('a')[0].href;
+                $.get(itemLink, function() {
+                    console.log("İttifak marketinden eşya satın alındı. Tekrar listeleme...");
+                    reListItem();
+                });
+            }
+        });
+    });
+}
+
+function reListItem() {
+    // Eşyayı tekrar listeleme işlemi
+    console.log("Eşya tekrar listeleniyor...");
+    // Listeleme mantığını burada ekleyin
+}
+
+// Sağlık kontrolü ve yiyecek satın alma fonksiyonları
+function checkHealthAndBuyFood() {
+    if (player.hp < 30) {
+        console.log("Sağlık %30'un altında. Yiyecek satın alınıyor...");
+        // Pazara gidip yiyecek satın alma
+        $.get('/game/index.php?mod=market&sh=' + sh, function(data) {
+            let foodItem = $(data).find('.item-5010 a')[0]; // Örnek yiyecek öğesi
+            if (foodItem) {
+                let itemLink = $(foodItem).attr('href');
+                $.get(itemLink, function() {
+                    console.log("Yiyecek satın alındı. Kullanılıyor...");
+                    useFood();
+                });
+            }
+        });
+    }
+}
+
+function useFood() {
+    // Envanterdeki yiyecek öğesini bulup kullanma
+    $.get('/game/index.php?mod=packages&sh=' + sh, function(data) {
+        let foodItem = $(data).find('.item-5010 a')[0]; // Envanterdeki örnek yiyecek öğesi
+        if (foodItem) {
+            let itemLink = $(foodItem).attr('href');
+            $.get(itemLink, function() {
+                console.log("Yiyecek kullanıldı.");
+            });
+        }
+    });
+}
 
 
 (function() {
@@ -20,8 +84,8 @@
     // Add CSS
 
     function addCustomCSS() {
-        const globalCSS = GM_getResourceText("customCSS_global");
-        GM_addStyle(globalCSS);
+        const customCSS = GM_getResourceText("gladiatusscripttt.css");
+        GM_addStyle(customCSS);
     };
     
     addCustomCSS();
@@ -30,7 +94,7 @@
     *     Global     *
     *****************/  
 
-    const assetsUrl = 'https://raw.githubusercontent.com/ebodziony/gladiatus-script/master/assets';
+    const assetsUrl = 'https://raw.githubusercontent.com/radeith/radeithbot/6cefc219d0dc8290520d755cf123e0e4822b7350/gladiatusscripttt.css';
 
     let autoGoActive = sessionStorage.getItem('autoGoActive') === "true" ? true : false;
 
@@ -945,6 +1009,14 @@
             }, clickDelay + 600);
 
         }
+
+        // Başlangıç fonksiyon çağrıları
+checkHealthAndBuyFood();
+manageAllianceMarket();
+
+// Interval kontrolleri
+setInterval(checkHealthAndBuyFood, 60000); // Sağlık kontrolü her 60 saniyede bir
+setInterval(manageAllianceMarket, 600000); // İttifak marketi kontrolü her 10 dakikada bir
 
         /*************************
         * Go Circus Provinciarum *
