@@ -1,16 +1,16 @@
 // ==UserScript==
 // @name         Gladiatus Script
 // @version      2.6.4
-// @description  Dodatek do gry Gladiatus
-// @author       Eryk Bodziony
+// @description  galyali by gladiatus
+// @author       galyalicrix
 // @match        *://*.gladiatus.gameforge.com/game/index.php*
 // @exclude      *://*.gladiatus.gameforge.com/game/index.php?mod=start
-// @downloadURL  https://github.com/ebodziony/gladiatus-script/raw/master/gladiatus-script.js
-// @updateURL    https://github.com/ebodziony/gladiatus-script/raw/master/gladiatus-script.js
+// @downloadURL  https://github.com/radeith/radeithbot/blob/6cefc219d0dc8290520d755cf123e0e4822b7350/gladiatusscript.js
+// @updateURL    https://github.com/radeith/radeithbot/blob/6cefc219d0dc8290520d755cf123e0e4822b7350/gladiatusscript.js
 // @grant        GM_addStyle
 // @grant        GM_getResourceText
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js
-// @resource     customCSS_global  https://raw.githubusercontent.com/ebodziony/gladiatus-script/master/global.css?ver=2.6.4
+// @resource     customCSS_global  https://raw.githubusercontent.com/radeith/radeithbot/6cefc219d0dc8290520d755cf123e0e4822b7350/gladiatusscripttt.css
 // ==/UserScript==
 
 
